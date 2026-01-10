@@ -22,3 +22,9 @@ dependencies = [
 dev = [
     "pytest>=9.0.2",
 ]
+
+[tool.uv]
+# Use CPU-only PyTorch to avoid downloading ~2GB of CUDA libraries
+extra-index-url = ["https://download.pytorch.org/whl/cpu"]
+# Allow packages to be resolved from any index (PyTorch CPU index doesn't have all packages)
+index-strategy = "unsafe-best-match"
