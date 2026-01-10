@@ -209,3 +209,4 @@ __marimo__/
 # Ugolki specific
 *.db
 frontend/dist/
+ugolki-keys.pem
