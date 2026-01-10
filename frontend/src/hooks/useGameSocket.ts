@@ -1,6 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const WS_URL = 'ws://localhost:8000/ws/game';
+// Determine WebSocket URL based on environment
+// In production, use the current host with /ws path (nginx proxies to backend)
+// In development, use localhost:8000 directly
+function getWebSocketUrl(): string {
+  if (import.meta.env.VITE_API_URL) {
+    // Production: use current host with ws/wss protocol
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}/ws/game`;
+  }
+  // Development: connect directly to backend
+  return 'ws://localhost:8000/ws/game';
+}
+
+const WS_URL = getWebSocketUrl();
 
 interface Move {
   from: [number, number];
