@@ -1,0 +1,57 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "submit": "Отправить",
+    "cancel": "Отмена",
+    "back": "Назад",
+    "save": "Сохранить"
+  },
+  "auth": {
+    "login": "Войти",
+    "signup": "Регистрация",
+    "logout": "Выйти",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "username": "Имя пользователя",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "loginError": "Неверная почта или пароль",
+    "signupError": "Не удалось создать аккаунт"
+  },
+  "nav": {
+    "home": "Главная",
+    "play": "Играть",
+    "leaderboard": "Рейтинг",
+    "profile": "Профиль"
+  },
+  "game": {
+    "title": "Уголки",
+    "subtitle": "Игра в уголки",
+    "vsAI": "Играть с ИИ",
+    "vsPvP": "Играть с игроком",
+    "createGame": "Создать игру",
+    "joinGame": "Присоединиться",
+    "waitingForOpponent": "Ожидание соперника...",
+    "yourTurn": "Ваш ход",
+    "opponentTurn": "Ход соперника",
+    "selectPiece": "Выберите фигуру",
+    "selectDestination": "Выберите клетку",
+    "youWin": "Вы победили!",
+    "youLose": "Вы проиграли!",
+    "gameOver": "Игра окончена",
+    "playAgain": "Играть снова",
+    "white": "Белые",
+    "black": "Чёрные",
+    "turn": "Ход",
+    "openGames": "Открытые игры",
+    "noOpenGames": "Нет доступных игр"
+  },
+  "leaderboard": {
+    "title": "Рейтинг",
+    "rank": "Место",
+    "player": "Игрок",
+    "elo": "Рейтинг",
+    "games": "Игр сыграно"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "back": "Back",
+    "save": "Save"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginError": "Invalid email or password",
+    "signupError": "Could not create account"
+  },
+  "nav": {
+    "home": "Home",
+    "play": "Play",
+    "leaderboard": "Leaderboard",
+    "profile": "Profile"
+  },
+  "game": {
+    "title": "Ugolki",
+    "subtitle": "The Corners Game",
+    "vsAI": "Play vs AI",
+    "vsPvP": "Play vs Player",
+    "createGame": "Create Game",
+    "joinGame": "Join Game",
+    "waitingForOpponent": "Waiting for opponent...",
+    "yourTurn": "Your turn",
+    "opponentTurn": "Opponent's turn",
+    "selectPiece": "Select a piece to move",
+    "selectDestination": "Select destination",
+    "youWin": "You win!",
+    "youLose": "You lose!",
+    "gameOver": "Game Over",
+    "playAgain": "Play Again",
+    "white": "White",
+    "black": "Black",
+    "turn": "Turn",
+    "openGames": "Open Games",
+    "noOpenGames": "No open games available"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "player": "Player",
+    "elo": "ELO",
+    "games": "Games Played"
+  }
+}

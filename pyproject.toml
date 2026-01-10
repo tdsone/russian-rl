@@ -1,0 +1,24 @@
+[project]
+name = "russian-rl"
+version = "0.1.0"
+description = "Ugolki - A Russian corners board game with web interface"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.4.1",
+    "torch>=2.9.1",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "websockets>=13.0",
+    "pydantic[email]>=2.0.0",
+    "aiosqlite>=0.20.0",
+    "greenlet>=3.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
