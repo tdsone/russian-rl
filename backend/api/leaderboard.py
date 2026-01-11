@@ -47,10 +47,11 @@ async def get_leaderboard(
     
     entries = []
     for i, user in enumerate(users):
-        # Count games played using a separate query
+        # Count completed games only (not waiting/active/abandoned games)
         games_result = await db.execute(
             select(func.count())
             .select_from(Game)
+            .where(Game.status == "completed")
             .where(
                 or_(
                     Game.white_player_id == user.id,

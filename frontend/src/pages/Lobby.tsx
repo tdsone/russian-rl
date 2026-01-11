@@ -20,17 +20,13 @@ export function LobbyPage() {
   const navigate = useNavigate();
   const [openGames, setOpenGames] = useState<OpenGame[]>([]);
   const [isCreating, setIsCreating] = useState(false);
-  const [waitingGameId, setWaitingGameId] = useState<number | null>(null);
 
   const handlers = {
     onGameCreated: useCallback((state: { game_id: number; status: string }) => {
       setIsCreating(false);
-      if (state.status === 'waiting') {
-        setWaitingGameId(state.game_id);
-      } else {
-        // AI game starts immediately
-        navigate(`/game/${state.game_id}`);
-      }
+      // Navigate to game page for both AI and PvP games
+      // For PvP games in "waiting" status, the Game page will show "waiting for opponent"
+      navigate(`/game/${state.game_id}`);
     }, [navigate]),
     onGameStarted: useCallback((state: { game_id: number }) => {
       navigate(`/game/${state.game_id}`);
@@ -71,10 +67,6 @@ export function LobbyPage() {
     getOpenGames();
   };
 
-  const handleCancelWaiting = () => {
-    setWaitingGameId(null);
-  };
-
   if (!user) {
     return null;
   }
@@ -86,25 +78,8 @@ export function LobbyPage() {
         <p className="text-muted-foreground">{t('game.subtitle')}</p>
       </div>
 
-      {/* Waiting for opponent overlay */}
-      {waitingGameId && (
-        <Card className="mb-8 border-primary">
-          <CardContent className="py-8 text-center">
-            <div className="animate-pulse mb-4">
-              <Users className="w-12 h-12 mx-auto text-primary" />
-            </div>
-            <p className="text-lg font-medium mb-2">{t('game.waitingForOpponent')}</p>
-            <p className="text-sm text-muted-foreground mb-4">Game ID: {waitingGameId}</p>
-            <Button variant="outline" onClick={handleCancelWaiting}>
-              {t('common.cancel')}
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Create game buttons */}
-      {!waitingGameId && (
-        <div className="grid md:grid-cols-2 gap-4 mb-8">
+      <div className="grid md:grid-cols-2 gap-4 mb-8">
           <Card className="hover:border-primary transition-colors cursor-pointer" onClick={handleCreateAIGame}>
             <CardHeader className="text-center">
               <Bot className="w-12 h-12 mx-auto mb-2 text-primary" />
@@ -135,7 +110,6 @@ export function LobbyPage() {
             </CardContent>
           </Card>
         </div>
-      )}
 
       {/* Open games list */}
       <Card>

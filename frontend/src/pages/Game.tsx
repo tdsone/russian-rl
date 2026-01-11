@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Users } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useGameSocket } from '@/hooks/useGameSocket';
 import { GameBoard } from '@/components/GameBoard';
@@ -80,6 +81,7 @@ export function GamePage() {
   // Determine player's color
   const myColor: 'white' | 'black' = gameState?.white_player_id === user.id ? 'white' : 'black';
   const isMyTurn = gameState?.turn === myColor && gameState?.status === 'active';
+  const isWaiting = gameState?.status === 'waiting';
 
   // Determine if player won
   const didWin = gameOver && (
@@ -87,36 +89,59 @@ export function GamePage() {
     (gameOver.winner === 'black' && gameState?.black_player_id === user.id)
   );
 
+  // Handle leaving game while waiting
+  const handleCancelWaiting = () => {
+    navigate('/lobby');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
-        {/* Game status */}
-        <Card className="mb-6 w-full max-w-md">
-          <CardHeader className="py-4">
-            <CardTitle className="text-center text-lg">
-              {gameOver ? (
-                <span className={didWin ? 'text-green-600' : 'text-red-600'}>
-                  {didWin ? t('game.youWin') : t('game.youLose')}
-                </span>
-              ) : (
-                <span>
-                  {isMyTurn ? t('game.yourTurn') : t('game.opponentTurn')}
-                </span>
-              )}
-            </CardTitle>
-          </CardHeader>
-          {!gameOver && gameState && (
-            <CardContent className="py-2 text-center text-sm text-muted-foreground">
-              <p>
-                {t('game.turn')}: {gameState.turn === 'white' ? t('game.white') : t('game.black')} | 
-                You: {myColor === 'white' ? t('game.white') : t('game.black')}
-              </p>
-              {gameState.game_type === 'ai' && (
-                <p className="text-xs mt-1">Playing against AI</p>
-              )}
+        {/* Waiting for opponent */}
+        {isWaiting && (
+          <Card className="mb-6 w-full max-w-md border-primary">
+            <CardContent className="py-8 text-center">
+              <div className="animate-pulse mb-4">
+                <Users className="w-12 h-12 mx-auto text-primary" />
+              </div>
+              <p className="text-lg font-medium mb-2">{t('game.waitingForOpponent')}</p>
+              <p className="text-sm text-muted-foreground mb-4">Game ID: {gameId}</p>
+              <Button variant="outline" onClick={handleCancelWaiting}>
+                {t('common.cancel')}
+              </Button>
             </CardContent>
-          )}
-        </Card>
+          </Card>
+        )}
+
+        {/* Game status */}
+        {!isWaiting && (
+          <Card className="mb-6 w-full max-w-md">
+            <CardHeader className="py-4">
+              <CardTitle className="text-center text-lg">
+                {gameOver ? (
+                  <span className={didWin ? 'text-green-600' : 'text-red-600'}>
+                    {didWin ? t('game.youWin') : t('game.youLose')}
+                  </span>
+                ) : (
+                  <span>
+                    {isMyTurn ? t('game.yourTurn') : t('game.opponentTurn')}
+                  </span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            {!gameOver && gameState && (
+              <CardContent className="py-2 text-center text-sm text-muted-foreground">
+                <p>
+                  {t('game.turn')}: {gameState.turn === 'white' ? t('game.white') : t('game.black')} | 
+                  You: {myColor === 'white' ? t('game.white') : t('game.black')}
+                </p>
+                {gameState.game_type === 'ai' && (
+                  <p className="text-xs mt-1">Playing against AI</p>
+                )}
+              </CardContent>
+            )}
+          </Card>
+        )}
 
         {/* Error message */}
         {error && (
@@ -126,18 +151,20 @@ export function GamePage() {
         )}
 
         {/* Game board */}
-        {gameState ? (
-          <GameBoard
-            board={gameState.board}
-            legalMoves={gameState.legal_moves}
-            isMyTurn={isMyTurn}
-            myColor={myColor}
-            onMove={handleMove}
-          />
-        ) : (
-          <div className="w-96 h-96 flex items-center justify-center bg-muted rounded-lg">
-            <p className="text-muted-foreground">{t('common.loading')}</p>
-          </div>
+        {!isWaiting && (
+          gameState ? (
+            <GameBoard
+              board={gameState.board}
+              legalMoves={gameState.legal_moves}
+              isMyTurn={isMyTurn}
+              myColor={myColor}
+              onMove={handleMove}
+            />
+          ) : (
+            <div className="w-96 h-96 flex items-center justify-center bg-muted rounded-lg">
+              <p className="text-muted-foreground">{t('common.loading')}</p>
+            </div>
+          )
         )}
 
         {/* Game over actions */}
@@ -150,7 +177,7 @@ export function GamePage() {
         )}
 
         {/* Instructions */}
-        {!gameOver && gameState && isMyTurn && (
+        {!isWaiting && !gameOver && gameState && isMyTurn && (
           <p className="mt-4 text-sm text-muted-foreground">
             {t('game.selectPiece')}
           </p>
