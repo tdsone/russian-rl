@@ -108,9 +108,58 @@ sudo tail -f /var/log/nginx/error.log
 
 The `deploy/setup-server.sh` script handles initial server setup.
 
-### Deploying Updates
+### Automatic Deployment (CI/CD)
 
-SSH into the server and run:
+The app is automatically deployed via GitHub Actions when you push to the `main` branch.
+
+**Workflow file:** `.github/workflows/deploy.yml`
+
+#### Setting Up GitHub Secrets
+
+You need to configure two secrets in your GitHub repository:
+
+1. Go to your repository on GitHub
+2. Navigate to **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret** and add:
+
+| Secret Name | Value |
+|-------------|-------|
+| `EC2_HOST` | `3.8.190.167` (your EC2 public IP) |
+| `EC2_SSH_KEY` | Contents of your `ugolki-keys.pem` file |
+
+To get your SSH key contents:
+```bash
+cat ugolki-keys.pem
+```
+Copy the entire output including `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----` lines.
+
+#### How It Works
+
+1. Push code to `main` branch
+2. GitHub Actions triggers the deploy workflow
+3. Workflow SSHs into EC2 and runs:
+   - `git fetch && git reset --hard origin/main`
+   - `uv sync` (update Python dependencies)
+   - `npm ci && npm run build` (rebuild frontend)
+   - `sudo systemctl restart ugolki` (restart backend)
+4. Deployment status is verified and shown in GitHub Actions
+
+#### Manual Trigger
+
+You can also trigger deployment manually:
+1. Go to **Actions** tab in GitHub
+2. Select **Deploy to AWS EC2** workflow
+3. Click **Run workflow** → **Run workflow**
+
+#### Viewing Deployment Status
+
+- Check the **Actions** tab in your GitHub repository
+- Green ✅ = successful deployment
+- Red ❌ = failed deployment (check logs for details)
+
+### Manual Deployment
+
+If you need to deploy manually, SSH into the server and run:
 
 ```bash
 cd ~/russian-rl
@@ -183,3 +232,4 @@ scp -i "ugolki-keys.pem" ubuntu@3.8.190.167:~/russian-rl/ugolki.db ./backup/
 - [ ] Add database backups to S3
 - [ ] Set up monitoring/alerting
 - [ ] Consider PostgreSQL for higher traffic
+- [x] ~~Set up CI/CD with GitHub Actions~~ (Done!)
