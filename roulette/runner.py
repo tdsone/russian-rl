@@ -21,10 +21,15 @@ class Runner:
         self.game = game
         self.agents = agents
 
-    def run_episode(self, collect_transitions: bool = False) -> EpisodeResult:
+    def run_episode(
+        self,
+        max_steps: int | None = None,
+        collect_transitions: bool = False,
+    ) -> EpisodeResult:
         """Run one full episode, routing transitions to each agent.
 
         Args:
+            max_steps: Stop early if this many steps are reached. Winner will be None.
             collect_transitions: If True, also return all transitions in EpisodeResult.
         """
         self.game.reset()
@@ -33,7 +38,7 @@ class Runner:
         steps = 0
         result = None
 
-        while True:
+        while max_steps is None or steps < max_steps:
             player = self.game.current_player
             agent = self.agents[player]
 
