@@ -27,6 +27,16 @@ class Game(ABC):
     def __init__(self) -> None:
         self.state = None
 
+    @property
+    @abstractmethod
+    def current_player(self) -> Any:
+        pass
+
+    @abstractmethod
+    def reset(self) -> Any:
+        """Reset to initial state and return the initial observation."""
+        pass
+
     @abstractmethod
     def get_legal_actions(self) -> list[Action]:
         pass

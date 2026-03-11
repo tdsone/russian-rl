@@ -8,6 +8,9 @@ from roulette.game.ugolki import Player
 class NaiveScoreMaxAgent(Agent):
     """Greedy agent that always picks the move with the highest immediate score delta."""
 
+    def __init__(self, player=None) -> None:
+        super().__init__(player)
+
     def process_experience(self, transition: Transition) -> None:
         pass
 

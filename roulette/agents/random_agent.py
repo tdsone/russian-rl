@@ -9,6 +9,9 @@ from roulette.game.base import Action, Game, Transition
 class RandomAgent(Agent):
     """An agent that plays completely randomly."""
 
+    def __init__(self, player=None) -> None:
+        super().__init__(player)
+
     def process_experience(self, transition: Transition) -> None:
         """Random agent doesn't learn from experience."""
         pass

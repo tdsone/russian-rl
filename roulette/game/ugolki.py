@@ -46,6 +46,20 @@ class Ugolki(Game):
 
         print(f"\nTurn: {self.turn}")
 
+    @property
+    def current_player(self) -> Player:
+        return self.turn
+
+    def reset(self) -> torch.Tensor:
+        """Reset to starting position and return the initial board."""
+        self.board = torch.zeros((8, 8), dtype=torch.long)
+        self.board[:4, :4] = 1
+        self.board[4:, 4:] = -1
+        self.score_white = 0
+        self.score_black = 0
+        self.turn = Player.WHITE
+        return self.board
+
     @classmethod
     def create_game(cls):
         """Create a new game at starting position."""
