@@ -15,8 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models.database import Game, User, async_session_maker
 from backend.services.auth import decode_token
 from backend.services.elo import calculate_elo_change
-from agents.random_agent import RandomAgent
-from games.ugolki import Ugolki
+from roulette.agents.random_agent import RandomAgent
+from roulette.game.ugolki import Ugolki
 
 # Store active WebSocket connections per game
 # game_id -> {user_id: websocket}

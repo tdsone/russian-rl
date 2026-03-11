@@ -1,4 +1,4 @@
-from games import Ugolki
+from roulette.game import Ugolki
 
 """
 -- Reinforcement Learning --

@@ -2,8 +2,8 @@
 
 import random
 
-from agents.base import Agent
-from games.base import Game
+from roulette.agents.base import Agent
+from roulette.game.base import Game
 
 
 class RandomAgent(Agent):

@@ -1,7 +1,7 @@
 import torch
 import pytest
 
-from games import Ugolki
+from roulette.game import Ugolki
 
 
 class TestGetLegalActions:

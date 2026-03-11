@@ -1,7 +1,7 @@
 import random
 import torch
 
-from games.base import Game, StepResult
+from roulette.game.base import Game, StepResult
 
 # Directions: North, East, South, West
 DIRECTIONS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
