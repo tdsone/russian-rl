@@ -147,8 +147,8 @@ export function useGameSocket(token: string | null, handlers: MessageHandler) {
   }, []);
 
   // Game actions
-  const createGame = useCallback((gameType: 'ai' | 'pvp') => {
-    send('create_game', { game_type: gameType });
+  const createGame = useCallback((gameType: 'ai' | 'pvp', agentId?: string) => {
+    send('create_game', { game_type: gameType, ...(agentId && { agent_id: agentId }) });
   }, [send]);
 
   const joinGame = useCallback((gameId: number) => {

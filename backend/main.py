@@ -10,6 +10,7 @@ from backend.models.database import init_db
 from backend.api.auth import router as auth_router
 from backend.api.leaderboard import router as leaderboard_router
 from backend.api.game_websocket import websocket_handler
+from roulette.agents import AGENT_REGISTRY
 
 
 @asynccontextmanager
@@ -30,7 +31,7 @@ app = FastAPI(
 # In production, ALLOWED_ORIGINS should be set to your domain(s)
 ALLOWED_ORIGINS = os.environ.get(
     "ALLOWED_ORIGINS", 
-    "http://localhost:5173,http://127.0.0.1:5173"
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://localhost:5174"
 ).split(",")
 
 app.add_middleware(
@@ -50,6 +51,20 @@ app.include_router(leaderboard_router)
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}
+
+
+@app.get("/agents")
+async def list_agents():
+    """List available AI agents."""
+    return [
+        {
+            "id": agent_id,
+            "name": info["name"],
+            "difficulty": info["difficulty"],
+            "description": info["description"],
+        }
+        for agent_id, info in AGENT_REGISTRY.items()
+    ]
 
 
 @app.websocket("/ws/game")

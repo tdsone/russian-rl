@@ -15,7 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models.database import Game, User, async_session_maker
 from backend.services.auth import decode_token
 from backend.services.elo import calculate_elo_change
-from roulette.agents.random_agent import RandomAgent
+from roulette.agents import AGENT_REGISTRY
+from roulette.agents.base import Agent
 from roulette.game.ugolki import Ugolki
 
 # Store active WebSocket connections per game
@@ -26,8 +27,11 @@ active_connections: dict[int, dict[int, WebSocket]] = {}
 # game_id -> Ugolki instance
 active_games: dict[int, Ugolki] = {}
 
-# AI agent instance
-ai_agent = RandomAgent()
+# Store AI agent per game
+# game_id -> Agent instance
+active_agents: dict[int, Agent] = {}
+
+DEFAULT_AGENT_ID = "random"
 
 
 async def get_user_from_token(token: str, db: AsyncSession) -> User | None:
@@ -90,6 +94,12 @@ async def handle_create_game(
 ) -> None:
     """Handle game creation request."""
     game_type = data.get("game_type", "ai")  # "ai" or "pvp"
+    agent_id = data.get("agent_id", DEFAULT_AGENT_ID)
+    
+    # Validate agent_id for AI games
+    if game_type == "ai" and agent_id not in AGENT_REGISTRY:
+        await send_message(websocket, "error", {"message": f"Unknown agent: {agent_id}"})
+        return
     
     # Create new Ugolki game
     ugolki = Ugolki.create_game()
@@ -109,6 +119,10 @@ async def handle_create_game(
     
     # Store game instance
     active_games[db_game.id] = ugolki
+    
+    # Store AI agent for this game
+    if game_type == "ai":
+        active_agents[db_game.id] = AGENT_REGISTRY[agent_id]["factory"]()
     
     # Store connection
     if db_game.id not in active_connections:
@@ -270,12 +284,15 @@ async def make_ai_move(game_id: int, db: AsyncSession) -> None:
         return
     
     ugolki = active_games[game_id]
+    agent = active_agents.get(game_id)
+    if agent is None:
+        return
     
     # Small delay to make it feel more natural
     await asyncio.sleep(0.5)
     
     # Get AI move
-    action = ai_agent.select_action(ugolki)
+    action = agent.select_action(ugolki)
     step_result = ugolki.step(action)
     
     # Update database

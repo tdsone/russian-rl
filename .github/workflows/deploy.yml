@@ -30,7 +30,7 @@ jobs:
             
             # Update Python dependencies
             echo "Updating Python dependencies..."
-            ~/.local/bin/uv sync
+            ~/.local/bin/uv sync --extra cpu
             
             # Rebuild frontend
             echo "Building frontend..."

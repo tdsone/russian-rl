@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Bot, Users, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useGameSocket } from '@/hooks/useGameSocket';
+import { agentsApi, type AgentInfo } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -14,12 +15,20 @@ interface OpenGame {
   created_at: string;
 }
 
+const DIFFICULTY_COLORS: Record<string, string> = {
+  Easy: 'bg-green-100 text-green-800',
+  Medium: 'bg-amber-100 text-amber-800',
+  Hard: 'bg-red-100 text-red-800',
+};
+
 export function LobbyPage() {
   const { t } = useTranslation();
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [openGames, setOpenGames] = useState<OpenGame[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [agents, setAgents] = useState<AgentInfo[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<string>('random');
 
   const handlers = {
     onGameCreated: useCallback((state: { game_id: number; status: string }) => {
@@ -42,6 +51,11 @@ export function LobbyPage() {
 
   const { isConnected, createGame, joinGame, getOpenGames } = useGameSocket(token, handlers);
 
+  // Fetch agents list
+  useEffect(() => {
+    agentsApi.list().then(setAgents).catch(console.error);
+  }, []);
+
   // Fetch open games on connect
   useEffect(() => {
     if (isConnected) {
@@ -51,7 +65,7 @@ export function LobbyPage() {
 
   const handleCreateAIGame = () => {
     setIsCreating(true);
-    createGame('ai');
+    createGame('ai', selectedAgent);
   };
 
   const handleCreatePvPGame = () => {
@@ -80,18 +94,41 @@ export function LobbyPage() {
 
       {/* Create game buttons */}
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-          <Card className="hover:border-primary transition-colors cursor-pointer" onClick={handleCreateAIGame}>
+          <Card>
             <CardHeader className="text-center">
               <Bot className="w-12 h-12 mx-auto mb-2 text-primary" />
               <CardTitle>{t('game.vsAI')}</CardTitle>
               <CardDescription>
-                Play against a computer opponent
+                Choose an opponent and start playing
               </CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <Button disabled={isCreating || !isConnected}>
-                {isCreating ? t('common.loading') : t('game.createGame')}
-              </Button>
+            <CardContent>
+              <div className="space-y-2 mb-4">
+                {agents.map((agent) => (
+                  <div
+                    key={agent.id}
+                    onClick={() => setSelectedAgent(agent.id)}
+                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${
+                      selectedAgent === agent.id
+                        ? 'border-primary bg-primary/5'
+                        : 'hover:border-muted-foreground/30'
+                    }`}
+                  >
+                    <div>
+                      <p className="font-medium">{agent.name}</p>
+                      <p className="text-sm text-muted-foreground">{agent.description}</p>
+                    </div>
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${DIFFICULTY_COLORS[agent.difficulty] ?? 'bg-gray-100 text-gray-800'}`}>
+                      {agent.difficulty}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center">
+                <Button onClick={handleCreateAIGame} disabled={isCreating || !isConnected}>
+                  {isCreating ? t('common.loading') : t('game.createGame')}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

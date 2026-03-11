@@ -36,6 +36,21 @@ export const authApi = {
   },
 };
 
+// Agents API
+export interface AgentInfo {
+  id: string;
+  name: string;
+  difficulty: string;
+  description: string;
+}
+
+export const agentsApi = {
+  list: async (): Promise<AgentInfo[]> => {
+    const response = await api.get('/agents');
+    return response.data;
+  },
+};
+
 // Leaderboard API
 export const leaderboardApi = {
   get: async (limit = 50, offset = 0) => {
