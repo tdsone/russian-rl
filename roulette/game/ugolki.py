@@ -1,10 +1,17 @@
 import random
+from enum import StrEnum
+
 import torch
 
-from roulette.game.base import Game, StepResult
+from roulette.game.base import Action, Game, StepResult
 
 # Directions: North, East, South, West
 DIRECTIONS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+
+class Player(StrEnum):
+    WHITE = "white"
+    BLACK = "black"
 
 
 class Ugolki(Game):
@@ -13,10 +20,15 @@ class Ugolki(Game):
         self.board = board
         self.score_white = 0
         self.score_black = 0
-        self.turn = "white"  # white starts
+        self.turn = Player.WHITE
 
-    def update_score(self):
-        raise NotImplementedError
+    def update_score(self, action: Action) -> None:
+        (from_row, from_col), (to_row, to_col) = action
+        delta = (to_row - from_row) + (to_col - from_col)
+        if self.turn == Player.WHITE:
+            self.score_white += delta
+        else:
+            self.score_black -= delta
 
     def print_board(self) -> None:
         """Print the current board state to terminal."""
@@ -67,16 +79,17 @@ class Ugolki(Game):
 
         return game
 
-    def apply_action(self, action: tuple[tuple[int, int], tuple[int, int]]) -> None:
+    def apply_action(self, action: Action) -> None:
         """Apply an action to the board (no validation, no return)."""
         (from_row, from_col), (to_row, to_col) = action
         # Move piece
         self.board[to_row, to_col] = self.board[from_row, from_col]
         self.board[from_row, from_col] = 0
+        self.update_score(action)
         # Switch turn
-        self.turn = "black" if self.turn == "white" else "white"
+        self.turn = Player.BLACK if self.turn == Player.WHITE else Player.WHITE
 
-    def get_legal_actions(self) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+    def get_legal_actions(self) -> list[Action]:
         """
         Returns list of (from_pos, to_pos) tuples for all legal moves.
 
@@ -85,7 +98,7 @@ class Ugolki(Game):
         - jump 1 to n times over another piece if the field is free (only NESW not diagonal)
         """
         actions = []
-        piece_value = 1 if self.turn == "white" else -1
+        piece_value = 1 if self.turn == Player.WHITE else -1
 
         # Find all pieces of current player
         piece_positions = torch.where(self.board == piece_value)
@@ -156,16 +169,16 @@ class Ugolki(Game):
         # Check if white won: all white pieces (1) must be in rows 4-7, cols 4-7
         white_in_black_corner = (self.board[4:, 4:] == 1).sum().item()
         if white_in_black_corner == 16:
-            return "white"
+            return Player.WHITE
 
         # Check if black won: all black pieces (-1) must be in rows 0-3, cols 0-3
         black_in_white_corner = (self.board[:4, :4] == -1).sum().item()
         if black_in_white_corner == 16:
-            return "black"
+            return Player.BLACK
 
         return None
 
-    def step(self, action: tuple[tuple[int, int], tuple[int, int]]) -> StepResult:
+    def step(self, action: Action) -> StepResult:
         """
         Apply action and return (state, reward, done, info).
 

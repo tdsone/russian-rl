@@ -17,6 +17,7 @@ dependencies = [
     "aiosqlite>=0.20.0",
     "greenlet>=3.0.0",
     "ipykernel>=7.2.0",
+    "matplotlib>=3.10.8",
 ]
 
 [dependency-groups]

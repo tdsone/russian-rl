@@ -3,17 +3,17 @@
 import random
 
 from roulette.agents.base import Agent
-from roulette.game.base import Game
+from roulette.game.base import Action, Game, Transition
 
 
 class RandomAgent(Agent):
     """An agent that plays completely randomly."""
 
-    def process_experience(self):
+    def process_experience(self, transition: Transition) -> None:
         """Random agent doesn't learn from experience."""
         pass
 
-    def select_action(self, game: Game) -> tuple[tuple[int, int], tuple[int, int]]:
+    def select_action(self, game: Game) -> Action:
         """Select a random legal action."""
         actions = game.get_legal_actions()
         if not actions:
